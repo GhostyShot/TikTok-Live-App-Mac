@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8"/>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&display=swap');
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width:100vw; height:100vh; background:transparent; overflow:hidden; font-family:'Inter',system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+.stats-bar { position:absolute; top:20px; left:20px; display:flex; flex-direction:column; gap:6px; }
+.stat-pill { display:flex; align-items:center; gap:8px; padding:7px 14px 7px 10px; background:rgba(0,0,0,0.55); border:1px solid rgba(255,255,255,0.12); border-radius:100px; backdrop-filter:blur(20px); min-width:100px; animation:fadeIn .3s ease; }
+.stat-icon { font-size:13px; }
+.stat-val { font-size:15px; font-weight:800; color:#fff; font-variant-numeric:tabular-nums; letter-spacing:-.3px; min-width:32px; }
+.stat-lbl { font-size:10px; font-weight:600; color:rgba(255,255,255,.4); text-transform:uppercase; letter-spacing:.8px; }
+.chat-wrap { position:absolute; bottom:90px; left:20px; width:320px; display:flex; flex-direction:column; gap:5px; }
+.chat-msg { display:flex; align-items:baseline; gap:6px; padding:7px 12px; background:rgba(0,0,0,0.52); border-radius:10px; backdrop-filter:blur(16px); border:1px solid rgba(255,255,255,.07); animation:slideUp .25s cubic-bezier(.34,1.4,.64,1); }
+.chat-user { font-size:12px; font-weight:700; color:#818cf8; white-space:nowrap; flex-shrink:0; }
+.chat-text { font-size:12px; font-weight:500; color:rgba(255,255,255,.88); word-break:break-word; }
+.follow-toast { position:absolute; bottom:22px; left:20px; display:flex; align-items:center; gap:10px; padding:10px 16px; background:rgba(0,0,0,0.6); border:1px solid rgba(52,211,153,.35); border-radius:100px; backdrop-filter:blur(20px); transform:translateY(12px); opacity:0; transition:all .35s cubic-bezier(.34,1.4,.64,1); pointer-events:none; }
+.follow-toast.show { opacity:1; transform:translateY(0); }
+.follow-dot { width:8px; height:8px; border-radius:50%; background:#34d399; box-shadow:0 0 8px #34d399; flex-shrink:0; }
+.follow-text { font-size:13px; font-weight:700; color:#fff; }
+.follow-name { color:#34d399; }
+.gifts-wrap { position:absolute; top:20px; right:20px; display:flex; flex-direction:column; align-items:flex-end; gap:8px; }
+.gift-card { display:flex; align-items:center; gap:10px; padding:10px 14px; background:rgba(0,0,0,0.58); border:1px solid rgba(251,191,36,.3); border-radius:12px; backdrop-filter:blur(20px); animation:popIn .4s cubic-bezier(.34,1.4,.64,1); max-width:230px; }
+.gift-emoji { font-size:22px; }
+.gift-name { font-size:13px; font-weight:700; color:#fbbf24; }
+.gift-by { font-size:11px; color:rgba(255,255,255,.45); margin-top:1px; }
+.gift-count { margin-left:auto; font-size:11px; font-weight:700; color:rgba(255,255,255,.5); background:rgba(255,255,255,.08); padding:2px 7px; border-radius:20px; flex-shrink:0; }
+.big-alert { position:absolute; top:72px; left:50%; transform:translateX(-50%) scale(.92); padding:14px 32px; background:rgba(0,0,0,0.72); border-radius:14px; backdrop-filter:blur(24px); text-align:center; opacity:0; pointer-events:none; transition:all .3s cubic-bezier(.34,1.4,.64,1); white-space:nowrap; border:1px solid rgba(255,255,255,.1); }
+.big-alert.show { opacity:1; transform:translateX(-50%) scale(1); }
+.big-alert-text { font-size:17px; font-weight:800; color:#fff; letter-spacing:-.4px; }
+.big-alert-line { position:absolute; bottom:0; left:0; right:0; height:2px; border-radius:0 0 14px 14px; }
+.actions-wrap { position:absolute; bottom:90px; right:20px; display:flex; flex-direction:column; align-items:flex-end; gap:5px; }
+.action-badge { padding:6px 12px; background:rgba(0,0,0,0.55); border:1px solid rgba(129,140,248,.3); border-radius:100px; font-size:11px; font-weight:700; color:rgba(255,255,255,.85); backdrop-filter:blur(12px); animation:slideLeft .25s cubic-bezier(.34,1.4,.64,1); }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+@keyframes slideUp { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+@keyframes slideLeft { from{opacity:0;transform:translateX(10px)} to{opacity:1;transform:none} }
+@keyframes popIn { 0%{opacity:0;transform:scale(.85) translateX(8px)} 60%{transform:scale(1.03)} 100%{opacity:1;transform:none} }
+@keyframes fadeOut { to{opacity:0;transform:translateY(-6px)} }
+</style>
+</head>
+<body>
+<div class="stats-bar">
+  <div class="stat-pill"><span class="stat-icon">👁</span><span class="stat-val" id="ov-viewers">0</span><span class="stat-lbl">Viewers</span></div>
+  <div class="stat-pill"><span class="stat-icon">❤️</span><span class="stat-val" id="ov-likes">0</span><span class="stat-lbl">Likes</span></div>
+  <div class="stat-pill"><span class="stat-icon">➕</span><span class="stat-val" id="ov-followers">0</span><span class="stat-lbl">Follower</span></div>
+</div>
+<div class="chat-wrap" id="chatWrap"></div>
+<div class="follow-toast" id="followToast">
+  <div class="follow-dot"></div>
+  <div class="follow-text">Neuer Follower: <span class="follow-name" id="followName"></span></div>
+</div>
+<div class="gifts-wrap" id="giftsWrap"></div>
+<div class="big-alert" id="bigAlert">
+  <div class="big-alert-text" id="bigAlertText"></div>
+  <div class="big-alert-line" id="bigAlertLine"></div>
+</div>
+<div class="actions-wrap" id="actionsWrap"></div>
+<script>
+const $=id=>document.getElementById(id);
+function fmt(n){n=parseInt(n)||0;if(n>=1e6)return(n/1e6).toFixed(1)+'M';if(n>=1e3)return(n/1e3).toFixed(1)+'K';return n+'';}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+let _s={viewers:0,likes:0,followers:0};
+function setStat(k,v){_s[k]=v;const el=$('ov-'+k);if(el)el.textContent=fmt(v);}
+function addChat(user,text){const el=document.createElement('div');el.className='chat-msg';el.innerHTML=`<span class="chat-user">@${esc(user)}</span><span class="chat-text">${esc(text)}</span>`;$('chatWrap').appendChild(el);while($('chatWrap').children.length>6)$('chatWrap').firstChild.remove();setTimeout(()=>{el.style.animation='fadeOut .3s ease forwards';setTimeout(()=>el.remove(),300);},9000);}
+let _ft;function showFollow(user){$('followName').textContent='@'+user;$('followToast').classList.add('show');clearTimeout(_ft);_ft=setTimeout(()=>$('followToast').classList.remove('show'),4500);setStat('followers',_s.followers+1);}
+function showGift(d){const el=document.createElement('div');el.className='gift-card';el.innerHTML=`<span class="gift-emoji">🎁</span><div><div class="gift-name">${esc(d.giftName||'Gift')}</div><div class="gift-by">von @${esc(d.user)}</div></div><span class="gift-count">×${d.count||1}</span>`;const w=$('giftsWrap');w.prepend(el);while(w.children.length>4)w.lastChild.remove();setTimeout(()=>{el.style.animation='fadeOut .3s ease forwards';setTimeout(()=>el.remove(),300);},5000);}
+let _at;function showAlert(msg,color,dur){$('bigAlertText').textContent=msg;const line=$('bigAlertLine');line.style.background=color||'#818cf8';line.style.boxShadow=`0 0 12px ${color||'#818cf8'}`;$('bigAlert').classList.add('show');clearTimeout(_at);_at=setTimeout(()=>$('bigAlert').classList.remove('show'),dur||3500);}
+function showAction(name,user){const el=document.createElement('div');el.className='action-badge';el.textContent=`⚡ ${name}${user?' · @'+user:''}`;const w=$('actionsWrap');w.prepend(el);while(w.children.length>5)w.lastChild.remove();setTimeout(()=>{el.style.animation='fadeOut .3s ease forwards';setTimeout(()=>el.remove(),300);},3500);}
+if(window.overlayBridge){
+  window.overlayBridge.on('overlay:viewers',d=>setStat('viewers',d.count||0));
+  window.overlayBridge.on('overlay:like',d=>setStat('likes',d.total||0));
+  window.overlayBridge.on('overlay:follow',d=>showFollow(d.user));
+  window.overlayBridge.on('overlay:gift',d=>showGift(d));
+  window.overlayBridge.on('overlay:chat',d=>addChat(d.user,d.text));
+  window.overlayBridge.on('overlay:alert',d=>showAlert(d.message,d.color,d.duration));
+  window.overlayBridge.on('overlay:action',d=>showAction(d.actionName,d.user));
+  window.overlayBridge.on('overlay:member',d=>showAction('Beigetreten',d.user));
+  window.overlayBridge.on('overlay:subscribe',d=>showAlert(`⭐ @${d.user} hat subscribed!`,'#f59e0b',4000));
+}
+</script>
+</body>
+</html>
