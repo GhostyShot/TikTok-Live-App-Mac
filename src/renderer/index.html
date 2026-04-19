@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TikLive Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles/main.css" />
+</head>
+<body>
+  <div id="app">
+    <div class="titlebar">
+      <div class="titlebar-drag">
+        <div class="app-logo">
+          <span class="logo-icon">◈</span>
+          <span class="logo-text">TikLive Studio</span>
+        </div>
+      </div>
+      <div class="titlebar-status" id="connectionBadge">
+        <span class="status-dot offline"></span>
+        <span class="status-label">Offline</span>
+      </div>
+    </div>
+    <nav class="sidebar" id="sidebar">
+      <button class="nav-item active" data-page="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg><span>Dashboard</span></button>
+      <button class="nav-item" data-page="events"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg><span>Events</span></button>
+      <button class="nav-item" data-page="chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Chat</span></button>
+      <button class="nav-item" data-page="overlay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><polyline points="8 21 12 17 16 21"/></svg><span>Overlay</span></button>
+      <button class="nav-item" data-page="goals"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Goals</span></button>
+      <button class="nav-item" data-page="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M5.34 18.66l-1.41 1.41M19.07 19.07l-1.41-1.41M5.34 5.34L3.93 3.93M21 12h-2M5 12H3M12 21v-2M12 5V3"/></svg><span>Settings</span></button>
+    </nav>
+    <main class="content" id="mainContent">
+      <section class="page active" id="page-dashboard">
+        <div class="page-header">
+          <h1>Dashboard</h1>
+          <div class="connect-bar">
+            <div class="input-group"><span class="input-prefix">@</span><input type="text" id="usernameInput" placeholder="TikTok Username" autocomplete="off" /></div>
+            <button class="btn btn-primary" id="connectBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>Connect</button>
+            <button class="btn btn-ghost" id="overlayBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/></svg>Overlay</button>
+          </div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card viewers"><div class="stat-icon">👁</div><div class="stat-body"><div class="stat-value" id="stat-viewers">0</div><div class="stat-label">Zuschauer</div></div></div>
+          <div class="stat-card likes"><div class="stat-icon">❤️</div><div class="stat-body"><div class="stat-value" id="stat-likes">0</div><div class="stat-label">Likes</div></div></div>
+          <div class="stat-card followers"><div class="stat-icon">➕</div><div class="stat-body"><div class="stat-value" id="stat-followers">0</div><div class="stat-label">Neue Follower</div></div></div>
+          <div class="stat-card shares"><div class="stat-icon">🔗</div><div class="stat-body"><div class="stat-value" id="stat-shares">0</div><div class="stat-label">Shares</div></div></div>
+        </div>
+        <div class="dashboard-split">
+          <div class="panel"><div class="panel-header"><h3>Live Aktivität</h3><span class="panel-badge" id="eventCount">0 Events</span></div><div class="event-feed" id="eventFeed"><div class="feed-empty"><span>◈</span><p>Verbinde dich mit TikTok Live</p></div></div></div>
+          <div class="panel"><div class="panel-header"><h3>Neueste Gifts</h3></div><div class="gift-feed" id="giftFeed"><div class="feed-empty"><span>🎁</span><p>Noch keine Gifts</p></div></div></div>
+        </div>
+        <div class="panel mt-16"><div class="panel-header"><h3>Action Log</h3><button class="btn btn-xs" id="clearLogBtn">Leeren</button></div><div class="action-log" id="actionLog"><div class="feed-empty"><span>⚡</span><p>Keine Actions ausgelöst</p></div></div></div>
+      </section>
+      <section class="page" id="page-events">
+        <div class="page-header"><h1>Events & Actions</h1><button class="btn btn-primary" id="addActionBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Neue Action</button></div>
+        <div class="actions-info-bar"><div class="info-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Actions werden automatisch ausgelöst wenn Events eintreffen</div></div>
+        <div class="actions-list" id="actionsList"></div>
+        <div class="modal-overlay hidden" id="actionModal">
+          <div class="modal">
+            <div class="modal-header"><h2 id="modalTitle">Neue Action</h2><button class="modal-close" id="modalClose">✕</button></div>
+            <div class="modal-body">
+              <div class="form-grid">
+                <div class="form-group"><label>Name</label><input type="text" id="actionName" placeholder="z.B. Space bei jedem Follow" /></div>
+                <div class="form-group"><label>Trigger (Event)</label><select id="actionTrigger"><option value="like">Like</option><option value="follow">Follow</option><option value="gift">Gift</option><option value="chat">Chat Nachricht</option><option value="member">Zuschauer tritt bei</option><option value="share">Share</option><option value="subscribe">Subscribe</option></select></div>
+                <div class="form-group" id="triggerValueGroup"><label id="triggerValueLabel">Alle X Events</label><input type="number" id="triggerValue" value="1" min="1" /></div>
+                <div class="form-group hidden" id="giftNameGroup"><label>Gift Name (leer = alle)</label><input type="text" id="triggerGiftName" placeholder="z.B. Rose" /></div>
+                <div class="form-group hidden" id="chatKeywordGroup"><label>Keyword (leer = alle)</label><input type="text" id="triggerKeyword" placeholder="z.B. !jump" /></div>
+                <div class="form-group"><label>Action Typ</label><select id="actionType"><option value="keystroke">Taste drücken</option><option value="overlay_alert">Overlay Alert</option></select></div>
+                <div class="form-group" id="keystrokeGroup"><label>Taste</label><div class="key-input-row"><div class="modifiers"><label class="checkbox-label"><input type="checkbox" value="control" class="modifier-check" /> Ctrl</label><label class="checkbox-label"><input type="checkbox" value="shift" class="modifier-check" /> Shift</label><label class="checkbox-label"><input type="checkbox" value="alt" class="modifier-check" /> Alt</label><label class="checkbox-label"><input type="checkbox" value="command" class="modifier-check" /> Cmd</label></div><input type="text" id="actionKey" placeholder="space / a / up / f1 ..." maxlength="10" /><button class="btn btn-xs" id="testKeyBtn">Testen</button></div></div>
+                <div class="form-group hidden" id="alertGroup"><label>Alert Nachricht</label><input type="text" id="alertMessage" placeholder="{user} hat gefolgt!" /></div>
+                <div class="form-group"><label>Wiederholen (mal)</label><input type="number" id="repeatCount" value="1" min="1" max="50" /></div>
+                <div class="form-group"><label>Verzögerung zwischen Wiederholungen (ms)</label><input type="number" id="repeatDelay" value="100" min="50" max="5000" /></div>
+              </div>
+            </div>
+            <div class="modal-footer"><button class="btn btn-ghost" id="modalCancel">Abbrechen</button><button class="btn btn-primary" id="modalSave">Speichern</button></div>
+          </div>
+        </div>
+      </section>
+      <section class="page" id="page-chat">
+        <div class="page-header"><h1>Live Chat</h1><button class="btn btn-ghost btn-sm" id="clearChatBtn">Chat leeren</button></div>
+        <div class="chat-container"><div class="chat-messages" id="chatMessages"><div class="feed-empty"><span>💬</span><p>Chat ist leer — starte ein Live!</p></div></div></div>
+      </section>
+      <section class="page" id="page-overlay">
+        <div class="page-header"><h1>Overlay Editor</h1><div class="header-actions"><button class="btn btn-ghost" id="previewOverlayBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Vorschau öffnen</button><button class="btn btn-primary" id="saveOverlayBtn">Speichern</button></div></div>
+        <div class="overlay-editor">
+          <div class="overlay-sidebar"><h3>Widgets</h3><div class="widget-list" id="widgetList"></div><h3 class="mt-24">Theme</h3><div class="theme-picker"><button class="theme-btn active" data-theme="neon">Neon</button><button class="theme-btn" data-theme="minimal">Minimal</button><button class="theme-btn" data-theme="glass">Glass</button></div><h3 class="mt-24">Schriftgröße</h3><input type="range" id="fontSizeSlider" min="10" max="24" value="14" class="slider" /><span id="fontSizeValue">14px</span><h3 class="mt-24">Transparenz</h3><input type="range" id="opacitySlider" min="30" max="100" value="90" class="slider" /><span id="opacityValue">90%</span></div>
+          <div class="overlay-preview" id="overlayPreview"><div class="preview-frame"><div class="preview-label">1280 × 720 — Overlay Vorschau</div><div class="preview-canvas" id="previewCanvas"></div></div></div>
+        </div>
+      </section>
+      <section class="page" id="page-goals">
+        <div class="page-header"><h1>Stream Goals</h1></div>
+        <div class="goals-grid" id="goalsGrid">
+          <div class="goal-card"><div class="goal-header"><span class="goal-icon">❤️</span><span class="goal-title">Like Goal</span><button class="goal-edit-btn" data-type="likes">Bearbeiten</button></div><div class="goal-progress-bar"><div class="goal-fill" id="goal-likes-fill" style="width:0%"></div></div><div class="goal-numbers"><span id="goal-likes-current">0</span> / <span id="goal-likes-target">1000</span></div></div>
+          <div class="goal-card"><div class="goal-header"><span class="goal-icon">➕</span><span class="goal-title">Follow Goal</span><button class="goal-edit-btn" data-type="followers">Bearbeiten</button></div><div class="goal-progress-bar"><div class="goal-fill" id="goal-followers-fill" style="width:0%"></div></div><div class="goal-numbers"><span id="goal-followers-current">0</span> / <span id="goal-followers-target">100</span></div></div>
+        </div>
+      </section>
+      <section class="page" id="page-settings">
+        <div class="page-header"><h1>Einstellungen</h1></div>
+        <div class="settings-content">
+          <div class="settings-section"><h3>Account</h3><div class="form-group"><label>Standard TikTok Username</label><div class="input-group"><span class="input-prefix">@</span><input type="text" id="settingsUsername" placeholder="dein_username" /></div></div></div>
+          <div class="settings-section"><h3>Keyboard Automation</h3><p class="settings-hint">Damit Tastatur-Actions funktionieren, muss TikLive Studio unter <strong>Systemeinstellungen → Datenschutz & Sicherheit → Bedienungshilfen</strong> zugelassen sein.</p><button class="btn btn-ghost" id="openAccessibilityBtn">Bedienungshilfen öffnen</button></div>
+          <div class="settings-section danger"><h3>Daten</h3><button class="btn btn-danger" id="resetStatsBtn">Session Stats zurücksetzen</button></div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

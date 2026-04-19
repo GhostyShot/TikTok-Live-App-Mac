@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<!--
+  TikLive Studio — Subathon Timer Widget
+  Browser-Source URL für OBS / TikTok Live Studio
+  Parameter: ?start=1800 ?gift=30 ?follow=15 ?subscribe=60 ?port=3456
+-->
+<html lang="de">
+<head>
+<meta charset="UTF-8"/>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@700&family=Syne:wght@800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:transparent;display:flex;justify-content:center;align-items:center;min-height:100vh;font-family:'Syne',sans-serif;}
+.timer-widget{background:rgba(7,7,13,0.88);border:1px solid rgba(88,101,242,0.4);border-radius:16px;padding:18px 28px;backdrop-filter:blur(16px);box-shadow:0 0 30px rgba(88,101,242,0.2);text-align:center;min-width:220px;position:relative;overflow:hidden;}
+.timer-glow{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(88,101,242,0.15) 0%,transparent 70%);pointer-events:none;}
+.timer-label{font-size:10px;font-weight:800;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;}
+.timer-display{font-family:'Space Mono',monospace;font-size:42px;font-weight:700;color:#fff;letter-spacing:-1px;line-height:1;transition:color 0.3s;}
+.timer-display.warning{color:#f5c542;}
+.timer-display.danger{color:#fe2c55;animation:timerPulse 0.8s infinite;}
+.timer-bar-track{height:4px;background:rgba(255,255,255,0.1);border-radius:2px;margin-top:12px;overflow:hidden;}
+.timer-bar-fill{height:100%;background:linear-gradient(90deg,#5865f2,#7c89ff);border-radius:2px;transition:width 1s linear,background 0.5s;box-shadow:0 0 8px rgba(88,101,242,0.6);}
+.timer-bar-fill.warning{background:linear-gradient(90deg,#f5c542,#ffd97d);}
+.timer-bar-fill.danger{background:linear-gradient(90deg,#fe2c55,#ff6b8a);}
+.timer-added{position:absolute;top:8px;right:12px;font-size:12px;font-weight:700;color:#3ddc84;opacity:0;pointer-events:none;}
+.timer-added.show{animation:addedFloat 1.2s ease forwards;}
+@keyframes timerPulse{0%,100%{opacity:1}50%{opacity:0.6}}
+@keyframes addedFloat{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-20px)}}
+</style>
+</head>
+<body>
+<div class="timer-widget" id="widget">
+  <div class="timer-glow"></div>
+  <div class="timer-label">⏱ SUBATHON TIMER</div>
+  <div class="timer-display" id="display">30:00</div>
+  <div class="timer-bar-track"><div class="timer-bar-fill" id="barFill" style="width:100%"></div></div>
+  <div class="timer-added" id="added">+0s</div>
+</div>
+<script>
+const params=new URLSearchParams(location.search);
+const START=parseInt(params.get('start')||1800);
+const GIFT_S=parseInt(params.get('gift')||30);
+const FOLLOW_S=parseInt(params.get('follow')||15);
+const SUB_S=parseInt(params.get('subscribe')||60);
+const WS_PORT=parseInt(params.get('port')||3456);
+let remaining=START;
+const display=document.getElementById('display');
+const barFill=document.getElementById('barFill');
+const addedEl=document.getElementById('added');
+function fmt(s){const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60;if(h>0)return`${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;return`${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;}
+function update(){display.textContent=fmt(remaining);const pct=Math.min(100,(remaining/START)*100);barFill.style.width=pct+'%';const isW=remaining<=120&&remaining>30,isD=remaining<=30;display.className='timer-display'+(isD?' danger':isW?' warning':'');barFill.className='timer-bar-fill'+(isD?' danger':isW?' warning':'');}
+function addTime(s,label){remaining=Math.min(remaining+s,START*3);addedEl.textContent='+'+s+'s '+(label||'');addedEl.classList.remove('show');void addedEl.offsetWidth;addedEl.classList.add('show');update();}
+setInterval(()=>{if(remaining>0)remaining--;update();},1000);
+update();
+function connectWS(){try{const ws=new WebSocket(`ws://localhost:${WS_PORT}`);ws.onmessage=(e)=>{try{const d=JSON.parse(e.data);if(d.type==='gift')addTime(GIFT_S,'🎁');if(d.type==='follow')addTime(FOLLOW_S,'➕');if(d.type==='subscribe')addTime(SUB_S,'⭐');}catch{}};ws.onclose=()=>setTimeout(connectWS,3000);ws.onerror=()=>{};}catch{}}
+connectWS();
+</script>
+</body>
+</html>
